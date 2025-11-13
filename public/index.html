@@ -1,0 +1,453 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>LPU One-Click Login</title>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
+        }
+
+        body {
+            font-family: -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, 'Helvetica Neue', Arial, sans-serif;
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            min-height: 100vh;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            padding: 20px;
+        }
+
+        .container {
+            background: white;
+            border-radius: 20px;
+            box-shadow: 0 20px 60px rgba(0, 0, 0, 0.3);
+            padding: 40px;
+            max-width: 500px;
+            width: 100%;
+            text-align: center;
+        }
+
+        .logo {
+            font-size: 60px;
+            margin-bottom: 20px;
+        }
+
+        h1 {
+            color: #333;
+            font-size: 28px;
+            margin-bottom: 10px;
+        }
+
+        .subtitle {
+            color: #666;
+            font-size: 16px;
+            margin-bottom: 30px;
+        }
+
+        .status-card {
+            background: #f8f9fa;
+            border-radius: 12px;
+            padding: 20px;
+            margin-bottom: 25px;
+            border-left: 4px solid #667eea;
+        }
+
+        .status-text {
+            font-size: 14px;
+            color: #555;
+            margin-bottom: 8px;
+        }
+
+        .status-indicator {
+            display: inline-flex;
+            align-items: center;
+            gap: 8px;
+            font-weight: 600;
+            font-size: 16px;
+        }
+
+        .status-dot {
+            width: 12px;
+            height: 12px;
+            border-radius: 50%;
+            background: #dc3545;
+            animation: pulse 2s infinite;
+        }
+
+        .status-dot.ready {
+            background: #28a745;
+        }
+
+        .status-dot.loading {
+            background: #ffc107;
+        }
+
+        @keyframes pulse {
+            0%, 100% { opacity: 1; }
+            50% { opacity: 0.5; }
+        }
+
+        .login-button {
+            background: linear-gradient(135deg, #667eea 0%, #764ba2 100%);
+            color: white;
+            border: none;
+            border-radius: 50px;
+            padding: 18px 40px;
+            font-size: 18px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: all 0.3s ease;
+            width: 100%;
+            box-shadow: 0 4px 15px rgba(102, 126, 234, 0.4);
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            gap: 10px;
+        }
+
+        .login-button:hover:not(:disabled) {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 20px rgba(102, 126, 234, 0.5);
+        }
+
+        .login-button:active:not(:disabled) {
+            transform: translateY(0);
+        }
+
+        .login-button:disabled {
+            opacity: 0.6;
+            cursor: not-allowed;
+        }
+
+        .spinner {
+            width: 20px;
+            height: 20px;
+            border: 3px solid rgba(255, 255, 255, 0.3);
+            border-top-color: white;
+            border-radius: 50%;
+            animation: spin 0.8s linear infinite;
+            display: none;
+        }
+
+        .login-button.loading .spinner {
+            display: block;
+        }
+
+        .login-button.loading .button-text {
+            display: none;
+        }
+
+        @keyframes spin {
+            to { transform: rotate(360deg); }
+        }
+
+        .message {
+            margin-top: 20px;
+            padding: 15px;
+            border-radius: 10px;
+            font-size: 14px;
+            display: none;
+        }
+
+        .message.success {
+            background: #d4edda;
+            color: #155724;
+            border: 1px solid #c3e6cb;
+            display: block;
+        }
+
+        .message.error {
+            background: #f8d7da;
+            color: #721c24;
+            border: 1px solid #f5c6cb;
+            display: block;
+        }
+
+        .message.info {
+            background: #d1ecf1;
+            color: #0c5460;
+            border: 1px solid #bee5eb;
+            display: block;
+        }
+
+        .features {
+            margin-top: 30px;
+            padding-top: 30px;
+            border-top: 1px solid #e9ecef;
+        }
+
+        .feature {
+            display: flex;
+            align-items: center;
+            gap: 12px;
+            margin-bottom: 15px;
+            text-align: left;
+            color: #555;
+            font-size: 14px;
+        }
+
+        .feature-icon {
+            font-size: 24px;
+            flex-shrink: 0;
+        }
+
+        .footer {
+            margin-top: 30px;
+            padding-top: 20px;
+            border-top: 1px solid #e9ecef;
+            color: #999;
+            font-size: 12px;
+        }
+
+        .progress-steps {
+            margin-top: 20px;
+            padding: 15px;
+            background: #f8f9fa;
+            border-radius: 10px;
+            display: none;
+        }
+
+        .progress-steps.active {
+            display: block;
+        }
+
+        .step {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+            padding: 8px 0;
+            color: #666;
+            font-size: 13px;
+        }
+
+        .step.active {
+            color: #667eea;
+            font-weight: 600;
+        }
+
+        .step.completed {
+            color: #28a745;
+        }
+
+        .step-icon {
+            width: 20px;
+            height: 20px;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="logo">🎓</div>
+        <h1>LPU One-Click Login</h1>
+        <p class="subtitle">Login to UMS instantly with automatic captcha solving</p>
+
+        <div class="status-card">
+            <div class="status-text">System Status</div>
+            <div class="status-indicator">
+                <span class="status-dot ready"></span>
+                <span id="statusText">Ready to Login</span>
+            </div>
+        </div>
+
+        <button class="login-button" id="loginButton" onclick="performLogin()">
+            <span class="spinner"></span>
+            <span class="button-text">🚀 Login to UMS</span>
+        </button>
+
+        <button class="login-button" id="dashboardButton" onclick="goToDashboard()" style="display: none; margin-top: 15px; background: linear-gradient(135deg, #11998e 0%, #38ef7d 100%);">
+            <span class="button-text">📊 View Dashboard</span>
+        </button>
+
+        <div class="message" id="message"></div>
+
+        <div class="progress-steps" id="progressSteps">
+            <div class="step" id="step1">
+                <span class="step-icon">⏳</span>
+                <span>Scraping login page...</span>
+            </div>
+            <div class="step" id="step2">
+                <span class="step-icon">🎯</span>
+                <span>Getting captcha parameters...</span>
+            </div>
+            <div class="step" id="step3">
+                <span class="step-icon">🖼️</span>
+                <span>Downloading captcha image...</span>
+            </div>
+            <div class="step" id="step4">
+                <span class="step-icon">🤖</span>
+                <span>Solving captcha with AI...</span>
+            </div>
+            <div class="step" id="step5">
+                <span class="step-icon">🔄</span>
+                <span>Converting captcha text...</span>
+            </div>
+            <div class="step" id="step6">
+                <span class="step-icon">📤</span>
+                <span>Submitting login form...</span>
+            </div>
+        </div>
+
+        <div class="features">
+            <div class="feature">
+                <span class="feature-icon">⚡</span>
+                <span>Instant login without manual captcha entry</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🤖</span>
+                <span>AI-powered captcha solving</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🔒</span>
+                <span>Secure credential handling</span>
+            </div>
+            <div class="feature">
+                <span class="feature-icon">🎯</span>
+                <span>Direct redirect to UMS dashboard</span>
+            </div>
+        </div>
+
+        <div class="footer">
+            Made with ❤️ for LPU Students
+        </div>
+    </div>
+
+    <script>
+        let currentStep = 0;
+        const steps = ['step1', 'step2', 'step3', 'step4', 'step5', 'step6'];
+
+        function showMessage(text, type) {
+            const messageDiv = document.getElementById('message');
+            messageDiv.textContent = text;
+            messageDiv.className = `message ${type}`;
+        }
+
+        function hideMessage() {
+            const messageDiv = document.getElementById('message');
+            messageDiv.style.display = 'none';
+        }
+
+        function updateStatus(text, dotClass) {
+            document.getElementById('statusText').textContent = text;
+            const dot = document.querySelector('.status-dot');
+            dot.className = `status-dot ${dotClass}`;
+        }
+
+        function showProgressSteps() {
+            document.getElementById('progressSteps').classList.add('active');
+        }
+
+        function hideProgressSteps() {
+            document.getElementById('progressSteps').classList.remove('active');
+            // Reset all steps
+            steps.forEach(stepId => {
+                document.getElementById(stepId).className = 'step';
+            });
+            currentStep = 0;
+        }
+
+        function simulateProgress() {
+            const stepDelay = 1500; // 1.5 seconds per step
+            
+            steps.forEach((stepId, index) => {
+                setTimeout(() => {
+                    // Mark current step as active
+                    document.getElementById(stepId).classList.add('active');
+                    
+                    // Mark previous steps as completed
+                    if (index > 0) {
+                        document.getElementById(steps[index - 1]).classList.remove('active');
+                        document.getElementById(steps[index - 1]).classList.add('completed');
+                    }
+                }, index * stepDelay);
+            });
+        }
+
+        function goToDashboard() {
+            window.location.href = '/success.html';
+        }
+
+        async function performLogin() {
+            const button = document.getElementById('loginButton');
+            
+            // Prevent double clicks
+            if (button.disabled) return;
+            
+            button.disabled = true;
+            button.classList.add('loading');
+            hideMessage();
+            updateStatus('Logging in...', 'loading');
+            showProgressSteps();
+            simulateProgress();
+
+            try {
+                const response = await fetch('/api/login', {
+                    method: 'POST',
+                    headers: {
+                        'Content-Type': 'application/json'
+                    }
+                });
+
+                const data = await response.json();
+
+                if (data.success) {
+                    // Mark last step as completed
+                    document.getElementById(steps[steps.length - 1]).classList.remove('active');
+                    document.getElementById(steps[steps.length - 1]).classList.add('completed');
+                    
+                    updateStatus('Login Successful!', 'ready');
+                    showMessage('✅ Login successful! Redirecting...', 'success');
+                    
+                    // Redirect to success page
+                    setTimeout(() => {
+                        window.location.href = '/success.html';
+                    }, 1500);
+                } else {
+                    hideProgressSteps();
+                    updateStatus('Login Failed', 'dot');
+                    showMessage(`❌ ${data.error || 'Login failed. Please try again.'}`, 'error');
+                    button.disabled = false;
+                    button.classList.remove('loading');
+                }
+            } catch (error) {
+                hideProgressSteps();
+                updateStatus('Error', 'dot');
+                showMessage(`❌ Network error: ${error.message}`, 'error');
+                button.disabled = false;
+                button.classList.remove('loading');
+            }
+        }
+
+        // Check server status on load
+        window.addEventListener('load', async () => {
+            try {
+                const response = await fetch('/api/health');
+                const data = await response.json();
+                
+                if (data.status === 'ok') {
+                    showMessage('🟢 Server is online and ready', 'info');
+                    setTimeout(hideMessage, 3000);
+                }
+
+                // Check if already logged in
+                const statusResponse = await fetch('/api/status');
+                const statusData = await statusResponse.json();
+                
+                if (statusData.loggedIn) {
+                    document.getElementById('dashboardButton').style.display = 'block';
+                    updateStatus('Already Logged In', 'ready');
+                    showMessage('✅ You are already logged in. Click "View Dashboard" to access UMS.', 'success');
+                }
+            } catch (error) {
+                showMessage('⚠️ Cannot connect to server. Please ensure the server is running.', 'error');
+            }
+        });
+    </script>
+</body>
+</html>

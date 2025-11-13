@@ -1,0 +1,33 @@
+{
+  "name": "lpu-one-click-login",
+  "version": "1.0.0",
+  "description": "One-click UMS login with automatic captcha solving using Anti-Captcha API",
+  "main": "server/index.js",
+  "scripts": {
+    "start": "node server/index.js",
+    "dev": "node server/index.js",
+    "deploy": "vercel --prod",
+    "deploy:preview": "vercel"
+  },
+  "keywords": [
+    "lpu",
+    "ums",
+    "login",
+    "captcha",
+    "automation",
+    "anti-captcha"
+  ],
+  "author": "itsrahulanshu",
+  "license": "MIT",
+  "dependencies": {
+    "@antiadmin/anticaptchaofficial": "^1.0.53",
+    "axios": "^1.5.0",
+    "cheerio": "1.0.0-rc.10",
+    "dotenv": "^17.2.2",
+    "express": "^4.18.2",
+    "undici": "^5.28.4"
+  },
+  "engines": {
+    "node": ">=18.0.0"
+  }
+}
